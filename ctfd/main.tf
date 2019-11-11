@@ -58,10 +58,10 @@ resource "null_resource" "ctfd" {
   triggers = {
     ctf_install = join(",", [
       google_compute_instance.ctfd.name,
-    filesha256("${path.module}/deploy-scripts/ctfd/install.sh")])
+    filesha256("${path.module}/deploy-scripts/install.sh")])
     ctf_install = join(",", [
       google_compute_instance.ctfd.name,
-    filesha256("${path.module}/deploy-scripts/ctfd/setup.sh")])
+    filesha256("${path.module}/deploy-scripts/setup.sh")])
   }
 
   provisioner "file" {
@@ -71,9 +71,9 @@ resource "null_resource" "ctfd" {
 
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /opt/deploy-scripts/**/*.sh",
-      "/opt/deploy-scripts/ctfd/install.sh",
-      "CTF_NAME='${var.ctf_name}' EMAIL='${var.email}' NAME='${var.username}' PASSWORD='${var.password}' /opt/deploy-scripts/ctfd/setup.sh"
+      "chmod +x /opt/deploy-scripts/*.sh",
+      "/opt/deploy-scripts/install.sh",
+      "CTF_NAME='${var.ctf_name}' EMAIL='${var.email}' NAME='${var.username}' PASSWORD='${var.password}' /opt/deploy-scripts/setup.sh"
     ]
   }
 }
