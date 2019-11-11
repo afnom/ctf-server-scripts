@@ -59,9 +59,18 @@ resource "null_resource" "ctfd" {
     ctf_install = join(",", [
       google_compute_instance.ctfd.name,
     filesha256("${path.module}/deploy-scripts/install.sh")])
-    ctf_install = join(",", [
+    ctf_setup = join(",", [
       google_compute_instance.ctfd.name,
     filesha256("${path.module}/deploy-scripts/setup.sh")])
+    ctf_nginx = join(",", [
+      google_compute_instance.ctfd.name,
+    filesha256("${path.module}/deploy-scripts/nginx.sh")])
+    nginx_conf = join(",", [
+      google_compute_instance.ctfd.name,
+    filesha256("${path.module}/assets/nginx.conf")])
+    ctfd_conf = join(",", [
+      google_compute_instance.ctfd.name,
+    filesha256("${path.module}/assets/ctfd.conf")])
   }
 
   provisioner "file" {
@@ -69,11 +78,17 @@ resource "null_resource" "ctfd" {
     destination = "/opt/"
   }
 
+  provisioner "file" {
+    source      = "${path.module}/assets"
+    destination = "/opt/"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "chmod +x /opt/deploy-scripts/*.sh",
       "/opt/deploy-scripts/install.sh",
-      "CTF_NAME='${var.ctf_name}' EMAIL='${var.email}' NAME='${var.username}' PASSWORD='${var.password}' /opt/deploy-scripts/setup.sh"
+      "CTF_NAME='${var.ctf_name}' EMAIL='${var.email}' NAME='${var.username}' PASSWORD='${var.password}' /opt/deploy-scripts/setup.sh",
+      "/opt/deploy-scripts/nginx.sh",
     ]
   }
 }
